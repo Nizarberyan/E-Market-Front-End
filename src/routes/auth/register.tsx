@@ -2,22 +2,38 @@ import { useForm } from 'react-hook-form';
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { authService, type RegisterData } from '../../services/auth.service';
+import { AxiosError } from 'axios';
+import { toast } from 'react-toastify';
 
 export default function RegisterPage() {
   const { register, handleSubmit } = useForm<RegisterData>();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const onSubmit = async (data: RegisterData) => {
     try {
       setLoading(true);
-      setError(null);
       await authService.register(data);
+      toast.success('Account created successfully!');
       navigate('/login');
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Network error - check if backend is running';
-      setError(`Registration failed: ${message}`);
+      let message = 'Network error - check if backend is running';
+
+      if (err instanceof AxiosError) {
+        if (err.response && err.response.data) {
+          if (err.response.data.error) {
+            message = err.response.data.error;
+          } else {
+            message = err.message;
+          }
+        } else {
+          message = err.message;
+        }
+      } else if (err instanceof Error) {
+        message = err.message;
+      }
+
+      toast.error(`Registration failed: ${message}`);
     } finally {
       setLoading(false);
     }
@@ -32,11 +48,7 @@ export default function RegisterPage() {
           </h2>
         </div>
         <div className="bg-white py-8 px-6 shadow rounded-lg">
-          {error && (
-            <div className="mb-4 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded">
-              {error}
-            </div>
-          )}
+
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
