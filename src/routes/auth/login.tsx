@@ -8,7 +8,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-  
+
   const onSubmit = async (data: LoginData) => {
     try {
       setLoading(true);
@@ -19,7 +19,7 @@ export default function LoginPage() {
         navigate('/');
       }
     } catch (err) {
-      setError('Login failed');
+      setError(`Login failed ${err}`);
     } finally {
       setLoading(false);
     }
@@ -73,7 +73,10 @@ export default function LoginPage() {
           <div className="mt-6 text-center">
             <span className="text-sm text-gray-600">
               Don't have an account?{' '}
-              <Link to="/register" className="font-medium text-blue-600 hover:text-blue-500">
+              <Link
+                to="/register"
+                className="font-medium text-blue-600 hover:text-blue-500"
+              >
                 Sign up
               </Link>
             </span>

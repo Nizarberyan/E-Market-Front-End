@@ -15,8 +15,8 @@ export default function RegisterPage() {
       setError(null);
       await authService.register(data);
       navigate('/login');
-    } catch (err: any) {
-      const message = err.response?.data?.message || err.message || 'Network error - check if backend is running';
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Network error - check if backend is running';
       setError(`Registration failed: ${message}`);
     } finally {
       setLoading(false);
