@@ -1,14 +1,22 @@
 import { useForm } from 'react-hook-form';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { authService, type RegisterData } from '../../services/auth.service';
 import { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
+import { useAuth } from '../../hooks/useAuth';
 
 export default function RegisterPage() {
   const { register, handleSubmit } = useForm<RegisterData>();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      navigate('/');
+    }
+  }, [user, navigate]);
 
   const onSubmit = async (data: RegisterData) => {
     try {

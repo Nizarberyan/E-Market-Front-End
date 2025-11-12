@@ -1,6 +1,10 @@
 import { Outlet, Link } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
 
 export default function Layout() {
+  const { user, logout } = useAuth();
+  console.log(user);
+
   return (
     <div className="min-h-screen flex flex-col">
       <header className="bg-white shadow-sm border-b">
@@ -18,18 +22,45 @@ export default function Layout() {
               >
                 Home
               </Link>
-              <Link
-                to="/login"
-                className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium"
-              >
-                Login
-              </Link>
-              <Link
-                to="/register"
-                className="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md text-sm font-medium"
-              >
-                Register
-              </Link>
+              {user?.role === 'admin' && (
+                <Link
+                  to="/admin"
+                  className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium"
+                >
+                  Admin Dashboard
+                </Link>
+              )}
+              {user ? (
+                <>
+                  <button
+                    onClick={logout}
+                    className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium"
+                  >
+                    Logout
+                  </button>
+                  <Link
+                    to={'/profile'}
+                    className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium"
+                  >
+                    Profile
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    className="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md text-sm font-medium"
+                  >
+                    Register
+                  </Link>
+                </>
+              )}
             </nav>
           </div>
         </div>

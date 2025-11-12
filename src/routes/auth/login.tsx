@@ -1,25 +1,35 @@
 import { useForm } from 'react-hook-form';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { authService, type LoginData } from '../../services/auth.service';
+import { useAuth } from '../../hooks/useAuth';
+import { toast } from 'react-toastify';
 
 export default function LoginPage() {
   const { register, handleSubmit } = useForm<LoginData>();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { user, setUser } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      navigate('/');
+    }
+  }, [user, navigate]);
 
   const onSubmit = async (data: LoginData) => {
     try {
       setLoading(true);
-      setError(null);
       const response = await authService.login(data);
       if (response.accessToken) {
         localStorage.setItem('token', response.accessToken);
+        localStorage.setItem('refreshToken', response.refreshToken);
+        setUser(response.user);
+        toast.success('Login successful!');
         navigate('/');
       }
     } catch (err) {
-      setError(`Login failed ${err}`);
+      toast.error('Login failed');
     } finally {
       setLoading(false);
     }
@@ -34,11 +44,6 @@ export default function LoginPage() {
           </h2>
         </div>
         <div className="bg-white py-8 px-6 shadow rounded-lg">
-          {error && (
-            <div className="mb-4 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded">
-              {error}
-            </div>
-          )}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
